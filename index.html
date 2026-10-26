@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Taxímetro Huaraz GPS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between p-4 selection:bg-amber-500 selection:text-slate-900">
 
@@ -16,8 +15,8 @@
       <span class="font-bold text-amber-400 tracking-wide text-sm">TAXÍMETRO HUARAZ</span>
     </div>
     <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-      <i class="fa-solid font-bold text-xs text-slate-300" id="gps-icon">📡</i>
-      <span id="gps-status" class="text-xs font-semibold text-emerald-400">GPS Conectado</span>
+      <span id="gps-icon" class="font-bold text-xs text-slate-300">📡</span>
+      <span id="gps-status" class="text-xs font-semibold text-emerald-400">GPS Listo</span>
     </div>
   </header>
 
@@ -115,7 +114,6 @@
   </div>
 
   <script>
-    // Configuración Tarifaria Huaraz
     let tariffs = {
       urbana: { banderazo: 4.00, km: 1.80, min: 0.30, minFare: 6.00, freeKm: 0.5 },
       periurbana: { banderazo: 6.00, km: 2.50, min: 0.40, minFare: 12.00, freeKm: 1.0 }
@@ -123,6 +121,7 @@
 
     let currentMode = 'urbana';
     let isRunning = false;
+    let isPaused = false;
     let startTime = null;
     let timerInterval = null;
     let totalDist = 0;
@@ -139,56 +138,80 @@
     function toggleTrip() {
       if (!isRunning) {
         startTrip();
-      } else {
+      } else if (!isPaused) {
         pauseTrip();
+      } else {
+        resumeTrip();
       }
     }
 
     function startTrip() {
-  isRunning = true;
-  startTime = new Date();
-  totalDist = 0;
-  totalWaitSec = 0;
-  lastPos = null;
+      isRunning = true;
+      isPaused = false;
+      startTime = new Date();
+      totalDist = 0;
+      totalWaitSec = 0;
+      lastPos = null;
 
-  // REINICIO INMEDIATO EN PANTALLA
-  document.getElementById('display-fare').innerText = '4.00';
-  document.getElementById('val-dist').innerText = '0.00 km';
-  document.getElementById('val-time').innerText = '00:00';
-  document.getElementById('val-speed').innerText = '0 km/h';
+      // Reseteo inmediato de la interfaz
+      document.getElementById('display-fare').innerText = tariffs[currentMode].banderazo.toFixed(2);
+      document.getElementById('val-dist').innerText = '0.00 km';
+      document.getElementById('val-time').innerText = '00:00';
+      document.getElementById('val-speed').innerText = '0 km/h';
+      document.getElementById('badge-mode').innerText = 'EN MARCHA';
 
-  document.getElementById('btn-start').innerText = '⏸️ PAUSAR';
-  document.getElementById('btn-start').className = 'bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
-  document.getElementById('btn-finish').disabled = false;
-  document.getElementById('btn-finish').className = 'bg-red-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      let btnStart = document.getElementById('btn-start');
+      btnStart.innerText = '⏸️ PAUSAR';
+      btnStart.className = 'bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      
+      let btnFinish = document.getElementById('btn-finish');
+      btnFinish.disabled = false;
+      btnFinish.className = 'bg-red-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
 
-  // Solicitar GPS real
-  if ("geolocation" in navigator) {
-    watchId = navigator.geolocation.watchPosition(handleGPS, handleGPSError, {
-      enableHighAccuracy: true,
-      maximumAge: 1000
-    });
-  }
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
 
-  timerInterval = setInterval(updateTimer, 1000);
-  requestWakeLock();
-}
+      if ("geolocation" in navigator) {
+        if (watchId) navigator.geolocation.clearWatch(watchId);
+        watchId = navigator.geolocation.watchPosition(handleGPS, handleGPSError, {
+          enableHighAccuracy: true,
+          maximumAge: 1000
+        });
+      }
+      requestWakeLock();
+    }
+
+    function pauseTrip() {
+      isPaused = true;
+      let btnStart = document.getElementById('btn-start');
+      btnStart.innerText = '▶️ REANUDAR';
+      btnStart.className = 'bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      document.getElementById('badge-mode').innerText = 'PAUSADO';
+    }
+
+    function resumeTrip() {
+      isPaused = false;
+      let btnStart = document.getElementById('btn-start');
+      btnStart.innerText = '⏸️ PAUSAR';
+      btnStart.className = 'bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      document.getElementById('badge-mode').innerText = 'EN MARCHA';
     }
 
     function handleGPS(pos) {
+      if (!isRunning || isPaused) return;
       document.getElementById('gps-status').innerText = 'GPS Activo';
       let speed = pos.coords.speed ? (pos.coords.speed * 3.6) : 0;
       document.getElementById('val-speed').innerText = Math.round(speed) + ' km/h';
 
       if (lastPos) {
         let d = getDistance(lastPos.latitude, lastPos.longitude, pos.coords.latitude, pos.coords.longitude);
-        if (d > 0.003) { // Filtrar saltos de GPS menores a 3 metros
+        if (d > 0.003) { // Filtrar saltos menores a 3 metros
           totalDist += d;
         }
       }
       lastPos = pos.coords;
 
-      if (speed < 12 && isRunning) {
+      if (speed < 12) {
         totalWaitSec++;
         document.getElementById('badge-mode').innerText = 'TRÁFICO / TIEMPO';
       } else {
@@ -199,10 +222,11 @@
     }
 
     function handleGPSError() {
-      document.getElementById('gps-status').innerText = 'GPS Desconectado';
+      document.getElementById('gps-status').innerText = 'GPS Esperando...';
     }
 
     function updateTimer() {
+      if (!isRunning || isPaused) return;
       let elapsedSec = Math.floor((new Date() - startTime) / 1000);
       let m = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
       let s = String(elapsedSec % 60).padStart(2, '0');
@@ -223,6 +247,7 @@
 
     function finishTrip() {
       isRunning = false;
+      isPaused = false;
       clearInterval(timerInterval);
       if (watchId) navigator.geolocation.clearWatch(watchId);
 
@@ -232,11 +257,13 @@
 
       document.getElementById('modal-receipt').classList.remove('hidden');
 
-      // Reset
-      document.getElementById('btn-start').innerText = '▶️ INICIAR CARRERA';
-      document.getElementById('btn-start').className = 'bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
-      document.getElementById('btn-finish').disabled = true;
-      document.getElementById('btn-finish').className = 'bg-slate-800 text-slate-500 font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      let btnStart = document.getElementById('btn-start');
+      btnStart.innerText = '▶️ INICIAR CARRERA';
+      btnStart.className = 'bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      
+      let btnFinish = document.getElementById('btn-finish');
+      btnFinish.disabled = true;
+      btnFinish.className = 'bg-slate-800 text-slate-500 font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
     }
 
     function closeReceipt() {
