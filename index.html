@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Taxímetro Huaraz GPS & Control Financiero</title>
+  <title>Taxímetro Huaraz GPS</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between p-3 selection:bg-amber-500 selection:text-slate-900 pb-6">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between p-3 selection:bg-amber-500 selection:text-slate-900 pb-4">
 
   <!-- Encabezado / Estado GPS -->
   <header class="flex justify-between items-center bg-slate-900 p-2.5 rounded-xl border border-slate-800 shadow-md">
@@ -120,12 +120,12 @@
     </div>
   </details>
 
-  <!-- PANTALLA PRINCIPAL DE COBRO DE CARRERA -->
+  <!-- PANTALLA PRINCIPAL DE COBRO DE CARRERA CON GPS -->
   <main class="my-auto py-2">
-    <div class="bg-slate-900 rounded-3xl p-4 border-2 border-amber-500/30 shadow-2xl text-center relative overflow-hidden">
+    <div class="bg-slate-900 rounded-3xl p-5 border-2 border-amber-500/30 shadow-2xl text-center relative overflow-hidden">
       
       <!-- Badges de Estado -->
-      <div class="flex justify-center gap-2 mb-1.5 flex-wrap">
+      <div class="flex justify-center gap-2 mb-2 flex-wrap">
         <span id="badge-tariff" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
           ZONA URBANA CORE
         </span>
@@ -136,56 +136,39 @@
 
       <!-- Tarifa Acumulada Carrera Actual -->
       <div class="text-slate-400 text-[9px] uppercase tracking-widest font-bold mb-0.5">Monto Carrera Actual</div>
-      <div class="text-5xl font-black tracking-tight text-white my-1 flex justify-center items-baseline gap-1">
-        <span class="text-xl text-amber-400 font-bold">S/</span>
+      <div class="text-6xl font-black tracking-tight text-white my-1 flex justify-center items-baseline gap-1">
+        <span class="text-2xl text-amber-400 font-bold">S/</span>
         <span id="display-fare" class="font-mono text-emerald-400">4.00</span>
       </div>
 
       <!-- Métricas en Tiempo Real -->
-      <div class="grid grid-cols-3 gap-1.5 mt-2.5 pt-2 border-t border-slate-800">
-        <div class="bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/80">
+      <div class="grid grid-cols-3 gap-1.5 mt-3 pt-3 border-t border-slate-800">
+        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
           <div class="text-[9px] text-slate-400 uppercase font-semibold">Distancia</div>
           <div class="text-xs font-bold text-slate-100 font-mono" id="val-dist">0.00 km</div>
         </div>
-        <div class="bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/80">
+        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
           <div class="text-[9px] text-slate-400 uppercase font-semibold">Tiempo</div>
           <div class="text-xs font-bold text-slate-100 font-mono" id="val-time">00:00</div>
         </div>
-        <div class="bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/80">
+        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
           <div class="text-[9px] text-slate-400 uppercase font-semibold">Velocidad</div>
           <div class="text-xs font-bold text-slate-100 font-mono" id="val-speed">0 km/h</div>
         </div>
       </div>
     </div>
 
-    <!-- BOTONES RÁPIDOS 6, 7, 8 SOLES Y RECARGOS DIGITABLES -->
-    <div class="mt-2.5 space-y-1.5">
-      <div class="text-[10px] text-slate-400 font-semibold flex justify-between items-center">
-        <span>Tarifas Rápidas Fijas</span>
-        <span id="extra-label" class="text-amber-400 font-mono">Extra: +S/ 0.00</span>
-      </div>
-      
-      <!-- Botones Directos S/ 6, 7, 8 -->
+    <!-- SELECCIÓN RÁPIDA DE TARIFARIO GEOGRÁFICO -->
+    <div class="mt-2.5">
       <div class="grid grid-cols-3 gap-1.5">
-        <button onclick="setFixedFare(6.00)" class="bg-slate-900 active:bg-amber-600/30 hover:bg-slate-800 py-2.5 rounded-xl border border-amber-500/40 text-amber-300 font-black text-sm shadow">
-          S/ 6.00
+        <button onclick="setPreset('urbana')" class="bg-slate-900 hover:bg-slate-800 p-2 rounded-xl text-center border border-slate-800 text-xs font-semibold text-slate-300">
+          🏛️ Centro Huaraz
         </button>
-        <button onclick="setFixedFare(7.00)" class="bg-slate-900 active:bg-amber-600/30 hover:bg-slate-800 py-2.5 rounded-xl border border-amber-500/40 text-amber-300 font-black text-sm shadow">
-          S/ 7.00
+        <button onclick="setPreset('urbana')" class="bg-slate-900 hover:bg-slate-800 p-2 rounded-xl text-center border border-slate-800 text-xs font-semibold text-slate-300">
+          🏥 EsSalud Vichay
         </button>
-        <button onclick="setFixedFare(8.00)" class="bg-slate-900 active:bg-amber-600/30 hover:bg-slate-800 py-2.5 rounded-xl border border-amber-500/40 text-amber-300 font-black text-sm shadow">
-          S/ 8.00
-        </button>
-      </div>
-
-      <!-- Digitación Manual de Recargo -->
-      <div class="flex gap-1.5 pt-1">
-        <input type="number" id="input-manual-extra" placeholder="Digitar recargo S/" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 w-full text-white text-xs font-mono focus:outline-none focus:border-amber-500">
-        <button onclick="applyManualExtra()" class="bg-amber-600 hover:bg-amber-500 active:bg-amber-700 text-white font-bold px-3 py-2 rounded-xl text-xs whitespace-nowrap">
-          + Recargo
-        </button>
-        <button onclick="clearExtra()" class="bg-slate-800 text-slate-400 font-semibold px-3 py-2 rounded-xl text-xs">
-          🧹
+        <button onclick="setPreset('periurbana')" class="bg-slate-900 hover:bg-slate-800 p-2 rounded-xl text-center border border-amber-500/40 text-xs font-semibold text-amber-300">
+          ♨️ Monterrey
         </button>
       </div>
     </div>
@@ -194,10 +177,10 @@
   <!-- BOTONES DE ACCIÓN PRINCIPALES -->
   <footer class="space-y-2 mt-1">
     <div class="grid grid-cols-2 gap-2">
-      <button id="btn-start" onclick="toggleTrip()" class="bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base">
+      <button id="btn-start" onclick="toggleTrip()" class="bg-emerald-600 active:bg-emerald-700 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base">
         ▶️ INICIAR CARRERA
       </button>
-      <button id="btn-finish" onclick="openPaymentModal()" disabled class="bg-slate-800 text-slate-500 font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base">
+      <button id="btn-finish" onclick="openPaymentModal()" disabled class="bg-slate-800 text-slate-500 font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base">
         🏁 FINALIZAR
       </button>
     </div>
@@ -270,8 +253,6 @@
     let timerInterval = null;
     let totalDist = 0;
     let totalWaitSec = 0;
-    let extraCharge = 0.00;
-    let fixedOverrideFare = null;
     let lastPos = null;
     let watchId = null;
 
@@ -347,25 +328,9 @@
       }
     }
 
-    function setFixedFare(amount) {
-      fixedOverrideFare = amount;
-      document.getElementById('display-fare').innerText = amount.toFixed(2);
-    }
-
-    function applyManualExtra() {
-      let val = parseFloat(document.getElementById('input-manual-extra').value);
-      if (!isNaN(val) && val > 0) {
-        extraCharge += val;
-        document.getElementById('extra-label').innerText = `Extra: +S/ ${extraCharge.toFixed(2)}`;
-        document.getElementById('input-manual-extra').value = '';
-        updateDisplay();
-      }
-    }
-
-    function clearExtra() {
-      extraCharge = 0.00;
-      fixedOverrideFare = null;
-      document.getElementById('extra-label').innerText = `Extra: +S/ 0.00`;
+    function setPreset(type) {
+      currentMode = type;
+      document.getElementById('badge-tariff').innerText = type === 'urbana' ? 'ZONA URBANA CORE' : 'ZONA PERIURBANA / MONTERREY';
       updateDisplay();
     }
 
@@ -385,11 +350,8 @@
       startTime = new Date();
       totalDist = 0;
       totalWaitSec = 0;
-      extraCharge = 0.00;
-      fixedOverrideFare = null;
       lastPos = null;
 
-      document.getElementById('extra-label').innerText = `Extra: +S/ 0.00`;
       document.getElementById('val-dist').innerText = '0.00 km';
       document.getElementById('val-time').innerText = '00:00';
       document.getElementById('val-speed').innerText = '0 km/h';
@@ -398,11 +360,11 @@
 
       let btnStart = document.getElementById('btn-start');
       btnStart.innerText = '⏸️ PAUSAR';
-      btnStart.className = 'bg-amber-600 text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      btnStart.className = 'bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
       
       let btnFinish = document.getElementById('btn-finish');
       btnFinish.disabled = false;
-      btnFinish.className = 'bg-red-600 text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      btnFinish.className = 'bg-red-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
 
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(updateTimer, 1000);
@@ -421,7 +383,7 @@
       isPaused = true;
       let btnStart = document.getElementById('btn-start');
       btnStart.innerText = '▶️ REANUDAR';
-      btnStart.className = 'bg-emerald-600 text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      btnStart.className = 'bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
       document.getElementById('badge-mode').innerText = 'PAUSADO';
     }
 
@@ -429,7 +391,7 @@
       isPaused = false;
       let btnStart = document.getElementById('btn-start');
       btnStart.innerText = '⏸️ PAUSAR';
-      btnStart.className = 'bg-amber-600 text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      btnStart.className = 'bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
       document.getElementById('badge-mode').innerText = 'EN MARCHA';
     }
 
@@ -471,16 +433,11 @@
     }
 
     function updateDisplay() {
-      if (fixedOverrideFare !== null) {
-        document.getElementById('display-fare').innerText = fixedOverrideFare.toFixed(2);
-        return;
-      }
-
       let t = tariffs[currentMode];
       let billableKm = Math.max(0, totalDist - t.freeKm);
       let waitMin = totalWaitSec / 60;
-      let calculatedFare = t.banderazo + (billableKm * t.km) + (waitMin * t.min) + extraCharge;
-      let finalFare = Math.max(t.minFare + extraCharge, calculatedFare);
+      let calculatedFare = t.banderazo + (billableKm * t.km) + (waitMin * t.min);
+      let finalFare = Math.max(t.minFare, calculatedFare);
 
       document.getElementById('display-fare').innerText = finalFare.toFixed(2);
       document.getElementById('val-dist').innerText = totalDist.toFixed(2) + ' km';
@@ -523,11 +480,11 @@
 
       let btnStart = document.getElementById('btn-start');
       btnStart.innerText = '▶️ INICIAR CARRERA';
-      btnStart.className = 'bg-emerald-600 text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      btnStart.className = 'bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
       
       let btnFinish = document.getElementById('btn-finish');
       btnFinish.disabled = true;
-      btnFinish.className = 'bg-slate-800 text-slate-500 font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      btnFinish.className = 'bg-slate-800 text-slate-500 font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
     }
 
     function resetShift() {
