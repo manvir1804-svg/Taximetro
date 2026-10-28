@@ -3,270 +3,213 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Taxímetro Huaraz GPS</title>
+  <title>Control Diario de Ganancias - Taxi</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between p-3 selection:bg-amber-500 selection:text-slate-900 pb-4">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between p-3 selection:bg-amber-500 selection:text-slate-900 pb-6">
 
-  <!-- Encabezado / Estado GPS -->
-  <header class="flex justify-between items-center bg-slate-900 p-2.5 rounded-xl border border-slate-800 shadow-md">
+  <!-- Encabezado -->
+  <header class="flex justify-between items-center bg-slate-900 p-3 rounded-2xl border border-slate-800 shadow-md">
     <div class="flex items-center gap-2">
-      <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-      <span class="font-bold text-amber-400 tracking-wide text-xs sm:text-sm">TAXÍMETRO HUARAZ</span>
+      <span class="text-xl">📊</span>
+      <span class="font-black text-amber-400 tracking-wide text-sm sm:text-base">REGISTRO DE GANANCIAS</span>
     </div>
-    <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
-      <span id="gps-icon" class="font-bold text-xs text-slate-300">📡</span>
-      <span id="gps-status" class="text-xs font-semibold text-emerald-400">GPS Listo</span>
-    </div>
+    <button onclick="resetShift()" class="text-xs bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700 font-bold transition-colors">
+      🔄 Nuevo Día
+    </button>
   </header>
 
   <!-- PANEL FINANCIERO Y META DIARIA -->
-  <section class="mt-2.5 bg-slate-900 p-3 rounded-2xl border border-amber-500/30 shadow-lg space-y-2.5">
+  <section class="mt-3 bg-slate-900 p-4 rounded-3xl border border-amber-500/30 shadow-2xl space-y-3">
     
     <!-- Meta Diaria y Progreso -->
     <div>
-      <div class="flex justify-between items-center mb-1">
-        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Meta Diaria: S/ <span id="lbl-goal">220.00</span></span>
-        <span id="lbl-progress-pct" class="text-[10px] font-mono font-bold text-emerald-400">0%</span>
+      <div class="flex justify-between items-center mb-1.5">
+        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Meta Diaria: S/ <span id="lbl-goal">220.00</span></span>
+        <span id="lbl-progress-pct" class="text-xs font-mono font-bold text-emerald-400">0%</span>
       </div>
-      <div class="w-full bg-slate-950 rounded-full h-2.5 border border-slate-800 overflow-hidden">
-        <div id="bar-progress" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-      </div>
-    </div>
-
-    <!-- Resumen Bruto, Gastos y Neta -->
-    <div class="grid grid-cols-3 gap-1.5 text-center">
-      <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
-        <div class="text-[9px] text-slate-400 font-semibold uppercase">Ing. Bruto</div>
-        <div id="fin-gross" class="text-sm font-black text-emerald-400 font-mono">S/ 0.00</div>
-      </div>
-      <div class="bg-slate-950 p-2 rounded-xl border border-red-900/50">
-        <div class="text-[9px] text-red-400 font-semibold uppercase">Gastos Tot.</div>
-        <div id="fin-expenses" class="text-sm font-black text-red-400 font-mono">S/ 141.00</div>
-      </div>
-      <div class="bg-slate-950 p-2 rounded-xl border border-amber-500/40">
-        <div class="text-[9px] text-amber-400 font-semibold uppercase">Ganancia Neta</div>
-        <div id="fin-net" class="text-sm font-black text-amber-300 font-mono">S/ -141.00</div>
+      <div class="w-full bg-slate-950 rounded-full h-3 border border-slate-800 overflow-hidden">
+        <div id="bar-progress" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
       </div>
     </div>
 
-    <!-- Desglose Efectivo / Yape / Carreras -->
-    <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
-      <div class="bg-slate-950/60 p-1 rounded-lg border border-slate-800 text-slate-300">
-        <span>💵 Efec: </span><span id="shift-cash" class="font-bold text-emerald-400 font-mono">S/ 0.00</span>
+    <!-- Indicadores Principales: Bruto, Gastos, Neta -->
+    <div class="grid grid-cols-3 gap-2 text-center">
+      <div class="bg-slate-950 p-2.5 rounded-2xl border border-slate-800">
+        <div class="text-[10px] text-slate-400 font-semibold uppercase">Ing. Bruto</div>
+        <div id="fin-gross" class="text-base font-black text-emerald-400 font-mono">S/ 0.00</div>
       </div>
-      <div class="bg-slate-950/60 p-1 rounded-lg border border-slate-800 text-slate-300">
-        <span>📱 Yape: </span><span id="shift-yape" class="font-bold text-purple-400 font-mono">S/ 0.00</span>
+      <div class="bg-slate-950 p-2.5 rounded-2xl border border-red-900/50">
+        <div class="text-[10px] text-red-400 font-semibold uppercase">Gastos Tot.</div>
+        <div id="fin-expenses" class="text-base font-black text-red-400 font-mono">S/ 141.00</div>
       </div>
-      <div class="bg-slate-950/60 p-1 rounded-lg border border-slate-800 text-slate-300">
-        <span>🚕 Viajes: </span><span id="shift-trips" class="font-bold text-amber-400 font-mono">0</span>
+      <div class="bg-slate-950 p-2.5 rounded-2xl border border-amber-500/40">
+        <div class="text-[10px] text-amber-400 font-semibold uppercase">Ganancia Neta</div>
+        <div id="fin-net" class="text-base font-black text-amber-300 font-mono">S/ -141.00</div>
       </div>
     </div>
 
-    <!-- BOTÓN RÁPIDO PARA REGISTRAR UBER / INDRIVE DIRECTO -->
-    <button onclick="openDirectIncomeModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 border border-indigo-400/30 shadow transition-colors">
-      📲 + Registrar Carrera Uber / InDrive / Directa
-    </button>
+    <!-- Desglose Efectivo, Yape y Conteo de Viajes -->
+    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+      <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800 text-slate-300">
+        <div class="text-[9px] text-slate-400 font-semibold uppercase">💵 Efectivo</div>
+        <div id="shift-cash" class="font-bold text-emerald-400 font-mono text-sm">S/ 0.00</div>
+      </div>
+      <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800 text-slate-300">
+        <div class="text-[9px] text-slate-400 font-semibold uppercase">📱 Yape</div>
+        <div id="shift-yape" class="font-bold text-purple-400 font-mono text-sm">S/ 0.00</div>
+      </div>
+      <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800 text-slate-300">
+        <div class="text-[9px] text-slate-400 font-semibold uppercase">🚕 Carreras</div>
+        <div id="shift-trips" class="font-bold text-amber-400 font-mono text-sm">0</div>
+      </div>
+    </div>
   </section>
 
-  <!-- SECCIÓN DESPLEGABLE DE GASTOS (FIJOS Y EXTRAS) -->
-  <details class="mt-2 bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-xs">
-    <summary class="font-bold text-slate-300 cursor-pointer flex justify-between items-center">
-      <span>⚙️ Gestor de Gastos del Turno</span>
-      <span class="text-[10px] text-amber-400">Ver / Editar</span>
-    </summary>
-    
-    <div class="mt-3 space-y-3 pt-2 border-t border-slate-800">
-      <!-- Gastos Fijos -->
-      <div>
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gastos Fijos Programados</span>
-        <div class="grid grid-cols-2 gap-2 text-[11px]">
-          <label class="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800">
-            <input type="checkbox" checked id="chk-almuerzo" onchange="recalcExpenses()" class="accent-amber-500 w-4 h-4">
-            <span>Almuerzo (S/ 36)</span>
-          </label>
-          <label class="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800">
-            <input type="checkbox" checked id="chk-gasolina" onchange="recalcExpenses()" class="accent-amber-500 w-4 h-4">
-            <span>Gasolina (S/ 15)</span>
-          </label>
-          <label class="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800">
-            <input type="checkbox" checked id="chk-glp" onchange="recalcExpenses()" class="accent-amber-500 w-4 h-4">
-            <span>GLP (S/ 30)</span>
-          </label>
-          <label class="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800">
-            <input type="checkbox" checked id="chk-alquiler" onchange="recalcExpenses()" class="accent-amber-500 w-4 h-4">
-            <span>Alquiler (S/ 60)</span>
-          </label>
-        </div>
-      </div>
+  <!-- REGISTRO RÁPIDO DE INGRESOS -->
+  <section class="mt-3 bg-slate-900 p-4 rounded-3xl border border-slate-800 shadow-xl space-y-3">
+    <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between items-center">
+      <span>➕ Registrar Carrera / Ingreso</span>
+      <span class="text-[10px] text-amber-400">Sumar al instante</span>
+    </div>
 
-      <!-- Gastos Extras para Digitar -->
-      <div>
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Agregar Gasto Extra</span>
-        <div class="flex gap-2">
-          <input type="number" id="input-extra-expense" placeholder="Monto S/" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 w-full text-white text-sm font-mono focus:outline-none focus:border-amber-500">
-          <button onclick="addExtraExpense()" class="bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold px-4 py-1.5 rounded-xl text-xs whitespace-nowrap">
-            + Añadir
-          </button>
-        </div>
-        <div class="mt-1 text-[10px] text-slate-400">
-          Gastos Extras acumulados: <span id="lbl-extra-expenses" class="font-bold text-red-400 font-mono">S/ 0.00</span>
-        </div>
-      </div>
-
-      <button onclick="resetShift()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs mt-1 border border-slate-700">
-        🔄 Reiniciar Todo el Turno
+    <!-- Botones Rápidos de Montos Frecuentes -->
+    <div class="grid grid-cols-3 gap-2">
+      <button onclick="setAmount(6.00)" class="bg-slate-950 hover:bg-slate-800 active:bg-amber-600/30 p-2.5 rounded-2xl border border-amber-500/30 text-amber-300 font-black text-base shadow">
+        S/ 6.00
+      </button>
+      <button onclick="setAmount(7.00)" class="bg-slate-950 hover:bg-slate-800 active:bg-amber-600/30 p-2.5 rounded-2xl border border-amber-500/30 text-amber-300 font-black text-base shadow">
+        S/ 7.00
+      </button>
+      <button onclick="setAmount(8.00)" class="bg-slate-950 hover:bg-slate-800 active:bg-amber-600/30 p-2.5 rounded-2xl border border-amber-500/30 text-amber-300 font-black text-base shadow">
+        S/ 8.00
       </button>
     </div>
-  </details>
 
-  <!-- PANTALLA PRINCIPAL DE COBRO DE CARRERA CON GPS -->
-  <main class="my-auto py-2">
-    <div class="bg-slate-900 rounded-3xl p-5 border-2 border-amber-500/30 shadow-2xl text-center relative overflow-hidden">
-      
-      <!-- Badges de Estado -->
-      <div class="flex justify-center gap-2 mb-2 flex-wrap">
-        <span id="badge-tariff" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
-          ZONA URBANA CORE
-        </span>
-        <span id="badge-mode" class="bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
-          EN ESPERA
-        </span>
-      </div>
-
-      <!-- Tarifa Acumulada Carrera Actual -->
-      <div class="text-slate-400 text-[9px] uppercase tracking-widest font-bold mb-0.5">Monto Carrera Actual</div>
-      <div class="text-6xl font-black tracking-tight text-white my-1 flex justify-center items-baseline gap-1">
-        <span class="text-2xl text-amber-400 font-bold">S/</span>
-        <span id="display-fare" class="font-mono text-emerald-400">4.00</span>
-      </div>
-
-      <!-- Métricas en Tiempo Real -->
-      <div class="grid grid-cols-3 gap-1.5 mt-3 pt-3 border-t border-slate-800">
-        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
-          <div class="text-[9px] text-slate-400 uppercase font-semibold">Distancia</div>
-          <div class="text-xs font-bold text-slate-100 font-mono" id="val-dist">0.00 km</div>
-        </div>
-        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
-          <div class="text-[9px] text-slate-400 uppercase font-semibold">Tiempo</div>
-          <div class="text-xs font-bold text-slate-100 font-mono" id="val-time">00:00</div>
-        </div>
-        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
-          <div class="text-[9px] text-slate-400 uppercase font-semibold">Velocidad</div>
-          <div class="text-xs font-bold text-slate-100 font-mono" id="val-speed">0 km/h</div>
-        </div>
-      </div>
+    <!-- Campo para Digitar Monto Manual -->
+    <div>
+      <input type="number" step="0.5" id="input-amount" placeholder="O digita el monto S/ (ej. 10.50)" class="bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 w-full text-emerald-400 text-2xl font-black font-mono text-center focus:outline-none focus:border-amber-500 shadow-inner">
     </div>
 
-    <!-- SELECCIÓN RÁPIDA DE TARIFARIO GEOGRÁFICO -->
-    <div class="mt-2.5">
-      <div class="grid grid-cols-3 gap-1.5">
-        <button onclick="setPreset('urbana')" class="bg-slate-900 hover:bg-slate-800 p-2 rounded-xl text-center border border-slate-800 text-xs font-semibold text-slate-300">
-          🏛️ Centro Huaraz
-        </button>
-        <button onclick="setPreset('urbana')" class="bg-slate-900 hover:bg-slate-800 p-2 rounded-xl text-center border border-slate-800 text-xs font-semibold text-slate-300">
-          🏥 EsSalud Vichay
-        </button>
-        <button onclick="setPreset('periurbana')" class="bg-slate-900 hover:bg-slate-800 p-2 rounded-xl text-center border border-amber-500/40 text-xs font-semibold text-amber-300">
-          ♨️ Monterrey
-        </button>
-      </div>
-    </div>
-  </main>
-
-  <!-- BOTONES DE ACCIÓN PRINCIPALES -->
-  <footer class="space-y-2 mt-1">
-    <div class="grid grid-cols-2 gap-2">
-      <button id="btn-start" onclick="toggleTrip()" class="bg-emerald-600 active:bg-emerald-700 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base">
-        ▶️ INICIAR CARRERA
+    <!-- Botones para confirmar pago Efectivo o Yape -->
+    <div class="grid grid-cols-2 gap-2 pt-1">
+      <button onclick="addIncome('cash')" class="bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-4 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg">
+        💵 + EFECTIVO
       </button>
-      <button id="btn-finish" onclick="openPaymentModal()" disabled class="bg-slate-800 text-slate-500 font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base">
-        🏁 FINALIZAR
+      <button onclick="addIncome('yape')" class="bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white font-bold py-4 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg">
+        📱 + YAPE
       </button>
     </div>
-  </footer>
+  </section>
 
-  <!-- MODAL INGRESO DIRECTO UBER / INDRIVE -->
-  <div id="modal-direct-income" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 w-full max-w-xs text-center shadow-2xl">
-      <h3 class="text-base font-bold text-amber-400 mb-1">Ingreso Uber / InDrive</h3>
-      <p class="text-xs text-slate-400 mb-3">Registra el cobro de la app o acuerdo</p>
-      
-      <div class="mb-3">
-        <input type="number" id="input-direct-amount" placeholder="Monto S/ (ej. 7.50)" class="bg-slate-950 border border-slate-700 rounded-2xl px-3 py-3 w-full text-emerald-400 text-2xl font-black font-mono text-center focus:outline-none focus:border-amber-500">
-      </div>
+  <!-- GESTOR DE GASTOS (FIJOS Y EXTRAS) -->
+  <section class="mt-3 bg-slate-900 p-4 rounded-3xl border border-slate-800 shadow-xl space-y-3">
+    <div class="text-xs font-bold text-slate-300 uppercase tracking-wider">
+      ⚙️ Control de Gastos del Turno
+    </div>
 
-      <p class="text-xs text-slate-300 font-semibold mb-2">¿Cómo te pagaron?</p>
-
-      <div class="space-y-2">
-        <button onclick="confirmDirectIncome('cash')" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-3 rounded-2xl text-sm flex items-center justify-center gap-2 shadow-lg">
-          💵 EFECTIVO
-        </button>
-        <button onclick="confirmDirectIncome('yape')" class="w-full bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white font-bold py-3 rounded-2xl text-sm flex items-center justify-center gap-2 shadow-lg">
-          📱 YAPE
-        </button>
-        <button onclick="closeDirectIncomeModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-400 font-semibold py-2 rounded-xl text-xs mt-1">
-          Cancelar
-        </button>
+    <!-- Gastos Fijos -->
+    <div>
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Gastos Fijos Diarios</span>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <input type="checkbox" checked id="chk-almuerzo" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
+          <span>Almuerzo (S/ 36)</span>
+        </label>
+        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <input type="checkbox" checked id="chk-gasolina" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
+          <span>Gasolina (S/ 15)</span>
+        </label>
+        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <input type="checkbox" checked id="chk-glp" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
+          <span>GLP (S/ 30)</span>
+        </label>
+        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <input type="checkbox" checked id="chk-alquiler" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
+          <span>Alquiler (S/ 60)</span>
+        </label>
       </div>
     </div>
-  </div>
 
-  <!-- MODAL SELECCIÓN DE PAGO CARRERA TAXÍMETRO -->
-  <div id="modal-payment" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 w-full max-w-xs text-center shadow-2xl">
-      <h3 class="text-base font-bold text-amber-400 mb-1">Cobro de Carrera</h3>
-      <p class="text-xs text-slate-400 mb-2">Monto Total a Cobrar:</p>
-      
-      <div class="text-4xl font-black text-emerald-400 font-mono mb-4 bg-slate-950 py-3 rounded-2xl border border-slate-800">
-        S/ <span id="modal-fare-amount">0.00</span>
+    <!-- Gastos Extras -->
+    <div class="pt-2 border-t border-slate-800">
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agregar Gasto Extra</span>
+      <div class="flex gap-2">
+        <input type="number" step="0.5" id="input-extra-expense" placeholder="Monto S/ (ej. 5.00)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 w-full text-white text-sm font-mono focus:outline-none focus:border-amber-500">
+        <button onclick="addExtraExpense()" class="bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">
+          + Registrar Gasto
+        </button>
       </div>
-
-      <p class="text-xs text-slate-300 font-semibold mb-3">¿Cómo pagó el cliente?</p>
-
-      <div class="space-y-2">
-        <button onclick="confirmPayment('cash')" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg">
-          💵 EFECTIVO
-        </button>
-        <button onclick="confirmPayment('yape')" class="w-full bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white font-bold py-3.5 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg">
-          📱 YAPE
-        </button>
-        <button onclick="closePaymentModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-400 font-semibold py-2 rounded-xl text-xs mt-1">
-          Volver a la carrera
-        </button>
+      <div class="mt-1.5 text-[11px] text-slate-400">
+        Gastos Extras acumulados: <span id="lbl-extra-expenses" class="font-bold text-red-400 font-mono">S/ 0.00</span>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- HISTORIAL ÚLTIMOS INGRESOS -->
+  <section class="mt-3 bg-slate-900 p-4 rounded-3xl border border-slate-800 shadow-xl space-y-2">
+    <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
+      <span>📋 Historial del Día</span>
+      <span id="lbl-last-entry" class="text-[10px] text-slate-400">Sin registro aún</span>
+    </div>
+    <div id="history-list" class="max-h-36 overflow-y-auto space-y-1.5 text-xs pr-1 font-mono">
+      <!-- Se llena dinámicamente -->
+    </div>
+  </section>
 
   <script>
-    // Tarifas Calibradas Huaraz
-    let tariffs = {
-      urbana: { banderazo: 4.00, km: 1.40, min: 0.20, minFare: 5.00, freeKm: 1.0 },
-      periurbana: { banderazo: 6.00, km: 2.00, min: 0.30, minFare: 10.00, freeKm: 1.0 }
-    };
-
     let dailyGoal = 220.00;
-    let currentMode = 'urbana';
-    let isRunning = false;
-    let isPaused = false;
-    let startTime = null;
-    let timerInterval = null;
-    let totalDist = 0;
-    let totalWaitSec = 0;
-    let lastPos = null;
-    let watchId = null;
-
-    // Acumuladores Financieros del Turno
     let shiftTrips = 0;
     let shiftCash = 0.00;
     let shiftYape = 0.00;
     let extraExpensesSum = 0.00;
+    let historyLog = [];
 
     window.onload = function() {
-      recalcExpenses();
+      loadShiftData();
     };
 
-    function recalcExpenses() {
+    function setAmount(val) {
+      document.getElementById('input-amount').value = val.toFixed(2);
+    }
+
+    function addIncome(type) {
+      let inputEl = document.getElementById('input-amount');
+      let val = parseFloat(inputEl.value);
+
+      if (isNaN(val) || val <= 0) {
+        alert('Ingresa o selecciona un monto válido');
+        return;
+      }
+
+      shiftTrips++;
+      if (type === 'cash') {
+        shiftCash += val;
+        historyLog.unshift({ type: '💵 Efectivo', amount: val, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+      } else {
+        shiftYape += val;
+        historyLog.unshift({ type: '📱 Yape', amount: val, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+      }
+
+      inputEl.value = '';
+      updateHistoryUI();
+      recalcFinances();
+    }
+
+    function addExtraExpense() {
+      let inputEl = document.getElementById('input-extra-expense');
+      let val = parseFloat(inputEl.value);
+
+      if (!isNaN(val) && val > 0) {
+        extraExpensesSum += val;
+        historyLog.unshift({ type: '🔻 Gasto Extra', amount: -val, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+        inputEl.value = '';
+        updateHistoryUI();
+        recalcFinances();
+      }
+    }
+
+    function recalcFinances() {
       let fixedTotal = 0;
       if (document.getElementById('chk-almuerzo').checked) fixedTotal += 36;
       if (document.getElementById('chk-gasolina').checked) fixedTotal += 15;
@@ -277,6 +220,11 @@
       let grossProfit = shiftCash + shiftYape;
       let netProfit = grossProfit - totalExpenses;
 
+      document.getElementById('shift-trips').innerText = shiftTrips;
+      document.getElementById('shift-cash').innerText = 'S/ ' + shiftCash.toFixed(2);
+      document.getElementById('shift-yape').innerText = 'S/ ' + shiftYape.toFixed(2);
+      document.getElementById('lbl-extra-expenses').innerText = 'S/ ' + extraExpensesSum.toFixed(2);
+
       document.getElementById('fin-gross').innerText = 'S/ ' + grossProfit.toFixed(2);
       document.getElementById('fin-expenses').innerText = 'S/ ' + totalExpenses.toFixed(2);
       document.getElementById('fin-net').innerText = 'S/ ' + netProfit.toFixed(2);
@@ -284,233 +232,82 @@
       let progressPct = Math.min(100, Math.max(0, (grossProfit / dailyGoal) * 100));
       document.getElementById('bar-progress').style.width = progressPct.toFixed(1) + '%';
       document.getElementById('lbl-progress-pct').innerText = progressPct.toFixed(0) + '%';
+
+      saveShiftData();
     }
 
-    // Modal de Ingreso Directo (Uber / InDrive)
-    function openDirectIncomeModal() {
-      document.getElementById('input-direct-amount').value = '';
-      document.getElementById('modal-direct-income').classList.remove('hidden');
-    }
+    function updateHistoryUI() {
+      let container = document.getElementById('history-list');
+      container.innerHTML = '';
 
-    function closeDirectIncomeModal() {
-      document.getElementById('modal-direct-income').classList.add('hidden');
-    }
-
-    function confirmDirectIncome(type) {
-      let val = parseFloat(document.getElementById('input-direct-amount').value);
-      if (isNaN(val) || val <= 0) {
-        alert('Ingresa un monto válido mayor a 0');
+      if (historyLog.length === 0) {
+        container.innerHTML = '<div class="text-slate-500 text-center py-2">Ingresa tu primera carrera o pago</div>';
         return;
       }
 
-      shiftTrips++;
-      if (type === 'cash') {
-        shiftCash += val;
-      } else if (type === 'yape') {
-        shiftYape += val;
+      historyLog.slice(0, 15).forEach(item => {
+        let isExpense = item.amount < 0;
+        let colorClass = isExpense ? 'text-red-400' : 'text-emerald-400';
+        let prefix = isExpense ? '' : '+S/ ';
+        
+        let div = document.createElement('div');
+        div.className = 'flex justify-between items-center bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800/60';
+        div.innerHTML = `
+          <span class="text-slate-300 font-sans">${item.type} <span class="text-[10px] text-slate-500 ml-1">${item.time}</span></span>
+          <span class="font-bold ${colorClass}">${prefix}${Math.abs(item.amount).toFixed(2)}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function saveShiftData() {
+      let data = {
+        shiftTrips: shiftTrips,
+        shiftCash: shiftCash,
+        shiftYape: shiftYape,
+        extraExpensesSum: extraExpensesSum,
+        historyLog: historyLog,
+        chkAlmuerzo: document.getElementById('chk-almuerzo').checked,
+        chkGasolina: document.getElementById('chk-gasolina').checked,
+        chkGlp: document.getElementById('chk-glp').checked,
+        chkAlquiler: document.getElementById('chk-alquiler').checked
+      };
+      localStorage.setItem('control_ganancias_taxi', JSON.stringify(data));
+    }
+
+    function loadShiftData() {
+      let saved = localStorage.getItem('control_ganancias_taxi');
+      if (saved) {
+        try {
+          let data = JSON.parse(saved);
+          shiftTrips = data.shiftTrips || 0;
+          shiftCash = data.shiftCash || 0;
+          shiftYape = data.shiftYape || 0;
+          extraExpensesSum = data.extraExpensesSum || 0;
+          historyLog = data.historyLog || [];
+
+          if (data.chkAlmuerzo !== undefined) document.getElementById('chk-almuerzo').checked = data.chkAlmuerzo;
+          if (data.chkGasolina !== undefined) document.getElementById('chk-gasolina').checked = data.chkGasolina;
+          if (data.chkGlp !== undefined) document.getElementById('chk-glp').checked = data.chkGlp;
+          if (data.chkAlquiler !== undefined) document.getElementById('chk-alquiler').checked = data.chkAlquiler;
+
+          updateHistoryUI();
+        } catch(e) {}
       }
-
-      document.getElementById('shift-trips').innerText = shiftTrips;
-      document.getElementById('shift-cash').innerText = 'S/ ' + shiftCash.toFixed(2);
-      document.getElementById('shift-yape').innerText = 'S/ ' + shiftYape.toFixed(2);
-
-      recalcExpenses();
-      closeDirectIncomeModal();
-    }
-
-    function addExtraExpense() {
-      let val = parseFloat(document.getElementById('input-extra-expense').value);
-      if (!isNaN(val) && val > 0) {
-        extraExpensesSum += val;
-        document.getElementById('lbl-extra-expenses').innerText = 'S/ ' + extraExpensesSum.toFixed(2);
-        document.getElementById('input-extra-expense').value = '';
-        recalcExpenses();
-      }
-    }
-
-    function setPreset(type) {
-      currentMode = type;
-      document.getElementById('badge-tariff').innerText = type === 'urbana' ? 'ZONA URBANA CORE' : 'ZONA PERIURBANA / MONTERREY';
-      updateDisplay();
-    }
-
-    function toggleTrip() {
-      if (!isRunning) {
-        startTrip();
-      } else if (!isPaused) {
-        pauseTrip();
-      } else {
-        resumeTrip();
-      }
-    }
-
-    function startTrip() {
-      isRunning = true;
-      isPaused = false;
-      startTime = new Date();
-      totalDist = 0;
-      totalWaitSec = 0;
-      lastPos = null;
-
-      document.getElementById('val-dist').innerText = '0.00 km';
-      document.getElementById('val-time').innerText = '00:00';
-      document.getElementById('val-speed').innerText = '0 km/h';
-      document.getElementById('badge-mode').innerText = 'EN MARCHA';
-      updateDisplay();
-
-      let btnStart = document.getElementById('btn-start');
-      btnStart.innerText = '⏸️ PAUSAR';
-      btnStart.className = 'bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
-      
-      let btnFinish = document.getElementById('btn-finish');
-      btnFinish.disabled = false;
-      btnFinish.className = 'bg-red-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
-
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(updateTimer, 1000);
-
-      if ("geolocation" in navigator) {
-        if (watchId) navigator.geolocation.clearWatch(watchId);
-        watchId = navigator.geolocation.watchPosition(handleGPS, handleGPSError, {
-          enableHighAccuracy: true,
-          maximumAge: 1000
-        });
-      }
-      requestWakeLock();
-    }
-
-    function pauseTrip() {
-      isPaused = true;
-      let btnStart = document.getElementById('btn-start');
-      btnStart.innerText = '▶️ REANUDAR';
-      btnStart.className = 'bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
-      document.getElementById('badge-mode').innerText = 'PAUSADO';
-    }
-
-    function resumeTrip() {
-      isPaused = false;
-      let btnStart = document.getElementById('btn-start');
-      btnStart.innerText = '⏸️ PAUSAR';
-      btnStart.className = 'bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
-      document.getElementById('badge-mode').innerText = 'EN MARCHA';
-    }
-
-    function handleGPS(pos) {
-      if (!isRunning || isPaused) return;
-      document.getElementById('gps-status').innerText = 'GPS Activo';
-      let speed = pos.coords.speed ? (pos.coords.speed * 3.6) : 0;
-      document.getElementById('val-speed').innerText = Math.round(speed) + ' km/h';
-
-      if (lastPos) {
-        let d = getDistance(lastPos.latitude, lastPos.longitude, pos.coords.latitude, pos.coords.longitude);
-        if (d > 0.003) {
-          totalDist += d;
-        }
-      }
-      lastPos = pos.coords;
-
-      if (speed < 12) {
-        totalWaitSec++;
-        document.getElementById('badge-mode').innerText = 'TRÁFICO / TIEMPO';
-      } else {
-        document.getElementById('badge-mode').innerText = 'EN MARCHA';
-      }
-
-      updateDisplay();
-    }
-
-    function handleGPSError() {
-      document.getElementById('gps-status').innerText = 'GPS Esperando...';
-    }
-
-    function updateTimer() {
-      if (!isRunning || isPaused) return;
-      let elapsedSec = Math.floor((new Date() - startTime) / 1000);
-      let m = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
-      let s = String(elapsedSec % 60).padStart(2, '0');
-      document.getElementById('val-time').innerText = `${m}:${s}`;
-      updateDisplay();
-    }
-
-    function updateDisplay() {
-      let t = tariffs[currentMode];
-      let billableKm = Math.max(0, totalDist - t.freeKm);
-      let waitMin = totalWaitSec / 60;
-      let calculatedFare = t.banderazo + (billableKm * t.km) + (waitMin * t.min);
-      let finalFare = Math.max(t.minFare, calculatedFare);
-
-      document.getElementById('display-fare').innerText = finalFare.toFixed(2);
-      document.getElementById('val-dist').innerText = totalDist.toFixed(2) + ' km';
-    }
-
-    function openPaymentModal() {
-      if (!isRunning) return;
-      let currentFare = document.getElementById('display-fare').innerText;
-      document.getElementById('modal-fare-amount').innerText = currentFare;
-      document.getElementById('modal-payment').classList.remove('hidden');
-    }
-
-    function closePaymentModal() {
-      document.getElementById('modal-payment').classList.add('hidden');
-    }
-
-    function confirmPayment(type) {
-      let currentFare = parseFloat(document.getElementById('display-fare').innerText) || 0;
-
-      shiftTrips++;
-      if (type === 'cash') {
-        shiftCash += currentFare;
-      } else if (type === 'yape') {
-        shiftYape += currentFare;
-      }
-
-      document.getElementById('shift-trips').innerText = shiftTrips;
-      document.getElementById('shift-cash').innerText = 'S/ ' + shiftCash.toFixed(2);
-      document.getElementById('shift-yape').innerText = 'S/ ' + shiftYape.toFixed(2);
-
-      recalcExpenses();
-      closePaymentModal();
-
-      isRunning = false;
-      isPaused = false;
-      clearInterval(timerInterval);
-      if (watchId) navigator.geolocation.clearWatch(watchId);
-
-      document.getElementById('badge-mode').innerText = 'EN ESPERA';
-
-      let btnStart = document.getElementById('btn-start');
-      btnStart.innerText = '▶️ INICIAR CARRERA';
-      btnStart.className = 'bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
-      
-      let btnFinish = document.getElementById('btn-finish');
-      btnFinish.disabled = true;
-      btnFinish.className = 'bg-slate-800 text-slate-500 font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base';
+      recalcFinances();
     }
 
     function resetShift() {
-      if (confirm('¿Deseas reiniciar los contadores de caja, gastos extras y carreras a cero?')) {
+      if (confirm('¿Deseas iniciar un nuevo día y reiniciar todos los contadores a cero?')) {
         shiftTrips = 0;
         shiftCash = 0.00;
         shiftYape = 0.00;
         extraExpensesSum = 0.00;
-        document.getElementById('shift-trips').innerText = '0';
-        document.getElementById('shift-cash').innerText = 'S/ 0.00';
-        document.getElementById('shift-yape').innerText = 'S/ 0.00';
-        document.getElementById('lbl-extra-expenses').innerText = 'S/ 0.00';
-        recalcExpenses();
+        historyLog = [];
+        localStorage.removeItem('control_ganancias_taxi');
+        updateHistoryUI();
+        recalcFinances();
       }
-    }
-
-    function getDistance(lat1, lon1, lat2, lon2) {
-      let R = 6371;
-      let dLat = (lat2 - lat1) * Math.PI / 180;
-      let dLon = (lon2 - lon1) * Math.PI / 180;
-      let a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-
-    async function requestWakeLock() {
-      try { if ('wakeLock' in navigator) await navigator.wakeLock.request('screen'); } catch (e) {}
     }
   </script>
 </body>
