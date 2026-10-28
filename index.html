@@ -19,13 +19,16 @@
     </button>
   </header>
 
-  <!-- PANEL FINANCIERO Y META DIARIA -->
-  <section class="mt-3 bg-slate-900 p-4 rounded-3xl border border-amber-500/30 shadow-2xl space-y-3">
+  <!-- PANEL FINANCIERO Y META DIARIA EDITABLE -->
+  <section class="mt-2.5 bg-slate-900 p-4 rounded-3xl border border-amber-500/30 shadow-2xl space-y-3">
     
-    <!-- Meta Diaria y Progreso -->
+    <!-- Meta Diaria Editable -->
     <div>
       <div class="flex justify-between items-center mb-1.5">
-        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Meta Diaria: S/ <span id="lbl-goal">220.00</span></span>
+        <button onclick="editDailyGoal()" class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1 hover:text-amber-300">
+          <span>🎯 Meta Diaria: S/ <span id="lbl-goal">220.00</span></span>
+          <span class="text-[10px] text-slate-500">✏️</span>
+        </button>
         <span id="lbl-progress-pct" class="text-xs font-mono font-bold text-emerald-400">0%</span>
       </div>
       <div class="w-full bg-slate-950 rounded-full h-3 border border-slate-800 overflow-hidden">
@@ -49,7 +52,7 @@
       </div>
     </div>
 
-    <!-- Desglose Efectivo, Yape y Conteo de Viajes -->
+    <!-- Desglose Pago (Efectivo / Yape / Viajes) -->
     <div class="grid grid-cols-3 gap-2 text-center text-xs">
       <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800 text-slate-300">
         <div class="text-[9px] text-slate-400 font-semibold uppercase">💵 Efectivo</div>
@@ -64,104 +67,175 @@
         <div id="shift-trips" class="font-bold text-amber-400 font-mono text-sm">0</div>
       </div>
     </div>
+
+    <!-- DESGLOSE POR ORIGEN (Calle, Uber, InDrive) -->
+    <div class="pt-2 border-t border-slate-800/80 grid grid-cols-3 gap-1.5 text-center text-[11px]">
+      <div class="bg-slate-950/40 p-1.5 rounded-xl border border-slate-800/60">
+        <span class="text-slate-400 block text-[9px] uppercase font-semibold">🚕 Calle</span>
+        <span id="shift-origin-calle" class="font-bold text-slate-200 font-mono">S/ 0.00</span>
+      </div>
+      <div class="bg-slate-950/40 p-1.5 rounded-xl border border-slate-800/60">
+        <span class="text-slate-400 block text-[9px] uppercase font-semibold">🚗 Uber</span>
+        <span id="shift-origin-uber" class="font-bold text-slate-200 font-mono">S/ 0.00</span>
+      </div>
+      <div class="bg-slate-950/40 p-1.5 rounded-xl border border-slate-800/60">
+        <span class="text-slate-400 block text-[9px] uppercase font-semibold">🚘 InDrive</span>
+        <span id="shift-origin-indrive" class="font-bold text-slate-200 font-mono">S/ 0.00</span>
+      </div>
+    </div>
   </section>
 
   <!-- REGISTRO RÁPIDO DE INGRESOS -->
-  <section class="mt-3 bg-slate-900 p-4 rounded-3xl border border-slate-800 shadow-xl space-y-3">
+  <section class="mt-2.5 bg-slate-900 p-4 rounded-3xl border border-slate-800 shadow-xl space-y-3">
     <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between items-center">
       <span>➕ Registrar Carrera / Ingreso</span>
       <span class="text-[10px] text-amber-400">Sumar al instante</span>
     </div>
 
-    <!-- Botones Rápidos de Montos Frecuentes -->
-    <div class="grid grid-cols-3 gap-2">
-      <button onclick="setAmount(6.00)" class="bg-slate-950 hover:bg-slate-800 active:bg-amber-600/30 p-2.5 rounded-2xl border border-amber-500/30 text-amber-300 font-black text-base shadow">
-        S/ 6.00
-      </button>
-      <button onclick="setAmount(7.00)" class="bg-slate-950 hover:bg-slate-800 active:bg-amber-600/30 p-2.5 rounded-2xl border border-amber-500/30 text-amber-300 font-black text-base shadow">
-        S/ 7.00
-      </button>
-      <button onclick="setAmount(8.00)" class="bg-slate-950 hover:bg-slate-800 active:bg-amber-600/30 p-2.5 rounded-2xl border border-amber-500/30 text-amber-300 font-black text-base shadow">
-        S/ 8.00
-      </button>
-    </div>
-
-    <!-- Campo para Digitar Monto Manual -->
+    <!-- Selección de Origen -->
     <div>
-      <input type="number" step="0.5" id="input-amount" placeholder="O digita el monto S/ (ej. 10.50)" class="bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 w-full text-emerald-400 text-2xl font-black font-mono text-center focus:outline-none focus:border-amber-500 shadow-inner">
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">1. Selecciona Origen</span>
+      <div class="grid grid-cols-3 gap-1.5">
+        <button onclick="selectOrigin('calle')" id="btn-orig-calle" class="origin-btn bg-amber-500/20 text-amber-300 border-amber-500/50 py-2 rounded-xl border text-xs font-bold flex justify-center items-center gap-1 shadow">
+          🚕 Calle
+        </button>
+        <button onclick="selectOrigin('uber')" id="btn-orig-uber" class="origin-btn bg-slate-950 text-slate-400 border-slate-800 py-2 rounded-xl border text-xs font-bold flex justify-center items-center gap-1 shadow">
+          🚗 Uber
+        </button>
+        <button onclick="selectOrigin('indrive')" id="btn-orig-indrive" class="origin-btn bg-slate-950 text-slate-400 border-slate-800 py-2 rounded-xl border text-xs font-bold flex justify-center items-center gap-1 shadow">
+          🚘 InDrive
+        </button>
+      </div>
     </div>
 
-    <!-- Botones para confirmar pago Efectivo o Yape -->
+    <!-- Botones Rápidos y Campo Manual -->
+    <div>
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">2. Monto de la Carrera</span>
+      <div class="grid grid-cols-3 gap-2 mb-2">
+        <button onclick="setAmount(6.00)" class="bg-slate-950 hover:bg-slate-800 active:bg-amber-600/30 p-2 rounded-xl border border-amber-500/30 text-amber-300 font-black text-base shadow">
+          S/ 6.00
+        </button>
+        <button onclick="setAmount(7.00)" class="bg-slate-950 hover:bg-slate-800 active:bg-amber-600/30 p-2 rounded-xl border border-amber-500/30 text-amber-300 font-black text-base shadow">
+          S/ 7.00
+        </button>
+        <button onclick="setAmount(8.00)" class="bg-slate-950 hover:bg-slate-800 active:bg-amber-600/30 p-2 rounded-xl border border-amber-500/30 text-amber-300 font-black text-base shadow">
+          S/ 8.00
+        </button>
+      </div>
+      <input type="number" step="0.5" id="input-amount" placeholder="O digita monto S/ (ej. 9.50)" class="bg-slate-950 border border-slate-700 rounded-2xl px-4 py-2.5 w-full text-emerald-400 text-2xl font-black font-mono text-center focus:outline-none focus:border-amber-500 shadow-inner">
+    </div>
+
+    <!-- Botones Confirmar Pago -->
     <div class="grid grid-cols-2 gap-2 pt-1">
-      <button onclick="addIncome('cash')" class="bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-4 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg">
+      <button onclick="addIncome('cash')" class="bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg">
         💵 + EFECTIVO
       </button>
-      <button onclick="addIncome('yape')" class="bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white font-bold py-4 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg">
+      <button onclick="addIncome('yape')" class="bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white font-bold py-3.5 rounded-2xl text-base flex items-center justify-center gap-2 shadow-lg">
         📱 + YAPE
       </button>
     </div>
   </section>
 
+  <!-- CONTROL DE KILOMETRAJE DIARIO -->
+  <details class="mt-2.5 bg-slate-900 p-3 rounded-2xl border border-slate-800 text-xs">
+    <summary class="font-bold text-slate-300 cursor-pointer flex justify-between items-center">
+      <span>📏 Control de Kilometraje del Auto</span>
+      <span id="lbl-km-summary" class="text-[10px] font-mono text-amber-400">0 km recorridos</span>
+    </summary>
+    <div class="mt-3 space-y-2.5 pt-2 border-t border-slate-800">
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Km Inicial</label>
+          <input type="number" id="input-km-start" oninput="updateMileage()" placeholder="Ej. 125000" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 w-full text-white font-mono text-sm focus:outline-none focus:border-amber-500">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Km Final</label>
+          <input type="number" id="input-km-end" oninput="updateMileage()" placeholder="Ej. 125120" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 w-full text-white font-mono text-sm focus:outline-none focus:border-amber-500">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-center bg-slate-950 p-2 rounded-xl border border-slate-800/80">
+        <div>
+          <span class="text-[9px] text-slate-400 font-semibold uppercase block">Recorrido Total</span>
+          <span id="lbl-km-total" class="font-mono font-bold text-amber-400 text-sm">0 km</span>
+        </div>
+        <div>
+          <span class="text-[9px] text-slate-400 font-semibold uppercase block">Ingreso / Km</span>
+          <span id="lbl-km-yield" class="font-mono font-bold text-emerald-400 text-sm">S/ 0.00 / km</span>
+        </div>
+      </div>
+    </div>
+  </details>
+
   <!-- GESTOR DE GASTOS (FIJOS Y EXTRAS) -->
-  <section class="mt-3 bg-slate-900 p-4 rounded-3xl border border-slate-800 shadow-xl space-y-3">
-    <div class="text-xs font-bold text-slate-300 uppercase tracking-wider">
-      ⚙️ Control de Gastos del Turno
-    </div>
+  <details class="mt-2 bg-slate-900 p-3 rounded-2xl border border-slate-800 text-xs">
+    <summary class="font-bold text-slate-300 cursor-pointer flex justify-between items-center">
+      <span>⚙️ Control de Gastos del Turno</span>
+      <span class="text-[10px] text-amber-400">Ver / Editar</span>
+    </summary>
 
-    <!-- Gastos Fijos -->
-    <div>
-      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Gastos Fijos Diarios</span>
-      <div class="grid grid-cols-2 gap-2 text-xs">
-        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-          <input type="checkbox" checked id="chk-almuerzo" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
-          <span>Almuerzo (S/ 36)</span>
-        </label>
-        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-          <input type="checkbox" checked id="chk-gasolina" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
-          <span>Gasolina (S/ 15)</span>
-        </label>
-        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-          <input type="checkbox" checked id="chk-glp" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
-          <span>GLP (S/ 30)</span>
-        </label>
-        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-          <input type="checkbox" checked id="chk-alquiler" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
-          <span>Alquiler (S/ 60)</span>
-        </label>
+    <div class="mt-3 space-y-3 pt-2 border-t border-slate-800">
+      <!-- Gastos Fijos -->
+      <div>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Gastos Fijos Diarios</span>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <label class="flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+            <input type="checkbox" checked id="chk-almuerzo" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
+            <span>Almuerzo (S/ 36)</span>
+          </label>
+          <label class="flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+            <input type="checkbox" checked id="chk-gasolina" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
+            <span>Gasolina (S/ 15)</span>
+          </label>
+          <label class="flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+            <input type="checkbox" checked id="chk-glp" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
+            <span>GLP (S/ 30)</span>
+          </label>
+          <label class="flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+            <input type="checkbox" checked id="chk-alquiler" onchange="recalcFinances()" class="accent-amber-500 w-4 h-4">
+            <span>Alquiler (S/ 60)</span>
+          </label>
+        </div>
       </div>
-    </div>
 
-    <!-- Gastos Extras -->
-    <div class="pt-2 border-t border-slate-800">
-      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agregar Gasto Extra</span>
-      <div class="flex gap-2">
-        <input type="number" step="0.5" id="input-extra-expense" placeholder="Monto S/ (ej. 5.00)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 w-full text-white text-sm font-mono focus:outline-none focus:border-amber-500">
-        <button onclick="addExtraExpense()" class="bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">
-          + Registrar Gasto
-        </button>
-      </div>
-      <div class="mt-1.5 text-[11px] text-slate-400">
-        Gastos Extras acumulados: <span id="lbl-extra-expenses" class="font-bold text-red-400 font-mono">S/ 0.00</span>
+      <!-- Gastos Extras -->
+      <div class="pt-2 border-t border-slate-800">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agregar Gasto Extra</span>
+        <div class="flex gap-2">
+          <input type="number" step="0.5" id="input-extra-expense" placeholder="Monto S/" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 w-full text-white text-sm font-mono focus:outline-none focus:border-amber-500">
+          <button onclick="addExtraExpense()" class="bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap">
+            + Añadir
+          </button>
+        </div>
+        <div class="mt-1 text-[10px] text-slate-400">
+          Gastos Extras acumulados: <span id="lbl-extra-expenses" class="font-bold text-red-400 font-mono">S/ 0.00</span>
+        </div>
       </div>
     </div>
-  </section>
+  </details>
 
   <!-- HISTORIAL ÚLTIMOS INGRESOS -->
-  <section class="mt-3 bg-slate-900 p-4 rounded-3xl border border-slate-800 shadow-xl space-y-2">
-    <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
+  <section class="mt-2.5 bg-slate-900 p-3.5 rounded-2xl border border-slate-800 shadow-xl space-y-2 text-xs">
+    <div class="font-bold text-slate-300 uppercase tracking-wider flex justify-between">
       <span>📋 Historial del Día</span>
-      <span id="lbl-last-entry" class="text-[10px] text-slate-400">Sin registro aún</span>
+      <span class="text-[10px] text-slate-500">Últimos registros</span>
     </div>
-    <div id="history-list" class="max-h-36 overflow-y-auto space-y-1.5 text-xs pr-1 font-mono">
+    <div id="history-list" class="max-h-36 overflow-y-auto space-y-1.5 font-mono pr-1">
       <!-- Se llena dinámicamente -->
     </div>
   </section>
 
   <script>
     let dailyGoal = 220.00;
+    let selectedOriginType = 'calle'; // calle | uber | indrive
+
     let shiftTrips = 0;
     let shiftCash = 0.00;
     let shiftYape = 0.00;
+
+    let shiftCalle = 0.00;
+    let shiftUber = 0.00;
+    let shiftInDrive = 0.00;
+
     let extraExpensesSum = 0.00;
     let historyLog = [];
 
@@ -169,27 +243,65 @@
       loadShiftData();
     };
 
+    function editDailyGoal() {
+      let val = prompt('Ingresa tu nueva Meta Diaria en Soles:', dailyGoal);
+      if (val !== null) {
+        let parsed = parseFloat(val);
+        if (!isNaN(parsed) && parsed > 0) {
+          dailyGoal = parsed;
+          document.getElementById('lbl-goal').innerText = dailyGoal.toFixed(2);
+          recalcFinances();
+        }
+      }
+    }
+
+    function selectOrigin(type) {
+      selectedOriginType = type;
+      let btnCalle = document.getElementById('btn-orig-calle');
+      let btnUber = document.getElementById('btn-orig-uber');
+      let btnInDrive = document.getElementById('btn-orig-indrive');
+
+      [btnCalle, btnUber, btnInDrive].forEach(btn => {
+        btn.className = 'origin-btn bg-slate-950 text-slate-400 border-slate-800 py-2 rounded-xl border text-xs font-bold flex justify-center items-center gap-1 shadow';
+      });
+
+      if (type === 'calle') {
+        btnCalle.className = 'origin-btn bg-amber-500/20 text-amber-300 border-amber-500/50 py-2 rounded-xl border text-xs font-bold flex justify-center items-center gap-1 shadow';
+      } else if (type === 'uber') {
+        btnUber.className = 'origin-btn bg-blue-500/20 text-blue-300 border-blue-500/50 py-2 rounded-xl border text-xs font-bold flex justify-center items-center gap-1 shadow';
+      } else if (type === 'indrive') {
+        btnInDrive.className = 'origin-btn bg-emerald-500/20 text-emerald-300 border-emerald-500/50 py-2 rounded-xl border text-xs font-bold flex justify-center items-center gap-1 shadow';
+      }
+    }
+
     function setAmount(val) {
       document.getElementById('input-amount').value = val.toFixed(2);
     }
 
-    function addIncome(type) {
+    function addIncome(payType) {
       let inputEl = document.getElementById('input-amount');
       let val = parseFloat(inputEl.value);
 
       if (isNaN(val) || val <= 0) {
-        alert('Ingresa o selecciona un monto válido');
+        alert('Ingresa un monto válido');
         return;
       }
 
       shiftTrips++;
-      if (type === 'cash') {
-        shiftCash += val;
-        historyLog.unshift({ type: '💵 Efectivo', amount: val, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-      } else {
-        shiftYape += val;
-        historyLog.unshift({ type: '📱 Yape', amount: val, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-      }
+      if (payType === 'cash') shiftCash += val;
+      else shiftYape += val;
+
+      let originName = 'Calle';
+      if (selectedOriginType === 'calle') { shiftCalle += val; originName = 'Calle'; }
+      else if (selectedOriginType === 'uber') { shiftUber += val; originName = 'Uber'; }
+      else if (selectedOriginType === 'indrive') { shiftInDrive += val; originName = 'InDrive'; }
+
+      let payLabel = payType === 'cash' ? '💵' : '📱';
+      historyLog.unshift({ 
+        type: `${payLabel} ${originName}`, 
+        amount: val, 
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+      });
 
       inputEl.value = '';
       updateHistoryUI();
@@ -202,11 +314,30 @@
 
       if (!isNaN(val) && val > 0) {
         extraExpensesSum += val;
-        historyLog.unshift({ type: '🔻 Gasto Extra', amount: -val, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+        historyLog.unshift({ 
+          type: '🔻 Gasto Extra', 
+          amount: -val, 
+          time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+        });
         inputEl.value = '';
         updateHistoryUI();
         recalcFinances();
       }
+    }
+
+    function updateMileage() {
+      let start = parseFloat(document.getElementById('input-km-start').value) || 0;
+      let end = parseFloat(document.getElementById('input-km-end').value) || 0;
+      let diff = Math.max(0, end - start);
+
+      document.getElementById('lbl-km-total').innerText = diff.toFixed(0) + ' km';
+      document.getElementById('lbl-km-summary').innerText = diff.toFixed(0) + ' km recorridos';
+
+      let grossProfit = shiftCash + shiftYape;
+      let yieldPerKm = diff > 0 ? (grossProfit / diff) : 0;
+      document.getElementById('lbl-km-yield').innerText = 'S/ ' + yieldPerKm.toFixed(2) + ' / km';
+
+      saveShiftData();
     }
 
     function recalcFinances() {
@@ -223,6 +354,11 @@
       document.getElementById('shift-trips').innerText = shiftTrips;
       document.getElementById('shift-cash').innerText = 'S/ ' + shiftCash.toFixed(2);
       document.getElementById('shift-yape').innerText = 'S/ ' + shiftYape.toFixed(2);
+
+      document.getElementById('shift-origin-calle').innerText = 'S/ ' + shiftCalle.toFixed(2);
+      document.getElementById('shift-origin-uber').innerText = 'S/ ' + shiftUber.toFixed(2);
+      document.getElementById('shift-origin-indrive').innerText = 'S/ ' + shiftInDrive.toFixed(2);
+
       document.getElementById('lbl-extra-expenses').innerText = 'S/ ' + extraExpensesSum.toFixed(2);
 
       document.getElementById('fin-gross').innerText = 'S/ ' + grossProfit.toFixed(2);
@@ -233,6 +369,7 @@
       document.getElementById('bar-progress').style.width = progressPct.toFixed(1) + '%';
       document.getElementById('lbl-progress-pct').innerText = progressPct.toFixed(0) + '%';
 
+      updateMileage();
       saveShiftData();
     }
 
@@ -241,7 +378,7 @@
       container.innerHTML = '';
 
       if (historyLog.length === 0) {
-        container.innerHTML = '<div class="text-slate-500 text-center py-2">Ingresa tu primera carrera o pago</div>';
+        container.innerHTML = '<div class="text-slate-500 text-center py-2 font-sans">Sin carreras registradas hoy</div>';
         return;
       }
 
@@ -262,29 +399,46 @@
 
     function saveShiftData() {
       let data = {
+        dailyGoal: dailyGoal,
         shiftTrips: shiftTrips,
         shiftCash: shiftCash,
         shiftYape: shiftYape,
+        shiftCalle: shiftCalle,
+        shiftUber: shiftUber,
+        shiftInDrive: shiftInDrive,
         extraExpensesSum: extraExpensesSum,
         historyLog: historyLog,
+        kmStart: document.getElementById('input-km-start').value,
+        kmEnd: document.getElementById('input-km-end').value,
         chkAlmuerzo: document.getElementById('chk-almuerzo').checked,
         chkGasolina: document.getElementById('chk-gasolina').checked,
         chkGlp: document.getElementById('chk-glp').checked,
         chkAlquiler: document.getElementById('chk-alquiler').checked
       };
-      localStorage.setItem('control_ganancias_taxi', JSON.stringify(data));
+      localStorage.setItem('control_ganancias_v2', JSON.stringify(data));
     }
 
     function loadShiftData() {
-      let saved = localStorage.getItem('control_ganancias_taxi');
+      let saved = localStorage.getItem('control_ganancias_v2');
       if (saved) {
         try {
           let data = JSON.parse(saved);
+          dailyGoal = data.dailyGoal || 220.00;
+          document.getElementById('lbl-goal').innerText = dailyGoal.toFixed(2);
+
           shiftTrips = data.shiftTrips || 0;
           shiftCash = data.shiftCash || 0;
           shiftYape = data.shiftYape || 0;
+
+          shiftCalle = data.shiftCalle || 0;
+          shiftUber = data.shiftUber || 0;
+          shiftInDrive = data.shiftInDrive || 0;
+
           extraExpensesSum = data.extraExpensesSum || 0;
           historyLog = data.historyLog || [];
+
+          if (data.kmStart !== undefined) document.getElementById('input-km-start').value = data.kmStart;
+          if (data.kmEnd !== undefined) document.getElementById('input-km-end').value = data.kmEnd;
 
           if (data.chkAlmuerzo !== undefined) document.getElementById('chk-almuerzo').checked = data.chkAlmuerzo;
           if (data.chkGasolina !== undefined) document.getElementById('chk-gasolina').checked = data.chkGasolina;
@@ -298,13 +452,20 @@
     }
 
     function resetShift() {
-      if (confirm('¿Deseas iniciar un nuevo día y reiniciar todos los contadores a cero?')) {
+      if (confirm('¿Deseas iniciar un nuevo día y borrar los registros del turno actual?')) {
         shiftTrips = 0;
         shiftCash = 0.00;
         shiftYape = 0.00;
+        shiftCalle = 0.00;
+        shiftUber = 0.00;
+        shiftInDrive = 0.00;
         extraExpensesSum = 0.00;
         historyLog = [];
-        localStorage.removeItem('control_ganancias_taxi');
+
+        document.getElementById('input-km-start').value = '';
+        document.getElementById('input-km-end').value = '';
+
+        localStorage.removeItem('control_ganancias_v2');
         updateHistoryUI();
         recalcFinances();
       }
